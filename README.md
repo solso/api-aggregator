@@ -26,13 +26,13 @@ The scripts must be unnamed functions,
 ```lua
 return function()
   -- magic goes here
-ngx.exit(ngx.HTTP_OK)
+  ngx.exit(ngx.HTTP_OK)
 end
 ```
 
 A example of a proper user script,
 
-```
+```lua
 return function()
 
   local max_sentiment = 5
@@ -93,6 +93,51 @@ The developer of the application now, can have access to a new API endpoint call
 The end-point is derived from the name of the lua file. The naming convention is defined.
 
 ## ARCHITECTURE
+
+
+
+  +-+                                     |
+  | |                                     :
++-+ +------+                              |                                                                                                                            
+|cBLU      |                              |          +---------------+ 
+|+--------+|                              |          | Nginx LB      |
+||cWHI    ||GET /v1/sentence/SENTENCE.json (1)       |               | REST API Backend   +-------------+  
+||        |+---------------------------------------->| (or your      | (1) routes /v1/    | API App     |
+||        ||                              :          | LB of choice  |                    |             +--+
+||        ||                              |          | e.g. Haproxy) +------------------->|(Thin Process|  |
+||        ||GET /aggr/positive_word/SENTENCE.json (2)|               |                    |with Ruby for|  +--+
+||        |+---------------------------------------->|               |                    |SentimentAPI)|  |  |
+|+--------+|                              :          |               |                    +---+---------+  |  |
+|MobileApp |                              |          |               |                        |            |  |
++----------+                              |          |               |                        +---+--------+  |
+                                          |          |               |                            |           |
+                                          |          |               |                            +-----------+
+                                          |     +--->|               | API Aggregator
+                                          |     |    |               | (2) routes /api_sp/
+                                          |     |    |               +--------------+
+                                          |     |    |               |              |                                                  
+                                          |     |    |               |              |  
+                                          |     |    +---------------+              |  
+                                          |     | The .lua script does the          |
+                                          |     | requests to the REST API.         |
+                                          |     | Converts a single (2) call        |
+                                                | to multiple (1) calls             v
+                                                |                            +-------------------------------+
+                                                |                            |Nginx+LUA API Aggregator       |
+                                                |                            | /---------------------------\ |
+                                                |                            | |Sandbox                    | |
+                                                +----------------------------+ | /-----------------------\ | | 
+                                                                             | | |positive_word.lua {d}  | | |
+                                                                             | | \-----------------------/ | |
+                                                                             | | ...                       | |
+                                                                             | | /-----------------------\ | |
+                                                                             | | |something_else.lua {d} | | |
+                                                                             | | \-----------------------/ | |
+                                                                             | | /-----------------------\ | |
+                                                                             | | |another.lua        {d} | | |
+                                                                             | | \-----------------------/ | |
+                                                                             | \---------------------------/ |
+                                                                             +-------------------------------+
 
 
 
