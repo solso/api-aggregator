@@ -87,58 +87,17 @@ However, being able to colocate the aggregator script with the API have multiple
   to developers to use since they can create custom scripts to do complex operations.
   
 
-The developer of the application now, can have access to a new API endpoint called  _/aggr/postive_word/*.json__ that does all the heavy-lifting against the REST API of the provider. The result is a simpler and faster application.
+The developer of the application now, can have access to a new API endpoint called  _/aggr/positive_word/*.json__ that does all the heavy-lifting against the REST API of the provider. The result is a simpler and faster application.
 
 The end-point is derived from the name of the lua file. The naming convention is defined.
 
 ## ARCHITECTURE
 
+A small diagram to better understand the flow. The diagram depicts the flow of the example that 
+you can setup locally if you follow the HowTo Install section.
 
-```
-  +-+                                     |
-  | |                                     :
-+-+ +------+                              |                                                                                                                            
-|cBLU      |                              |          +---------------+ 
-|+--------+|                              |          | Nginx LB      |
-||cWHI    ||GET /v1/sentence/SENTENCE.json (1)       |               | REST API Backend   +-------------+  
-||        |+---------------------------------------->| (or your      | (1) routes /v1/    | API App     |
-||        ||                              :          | LB of choice  |                    |             +--+
-||        ||                              |          | e.g. Haproxy) +------------------->|(Thin Process|  |
-||        ||GET /aggr/positive_word/SENTENCE.json (2)|               |                    |with Ruby for|  +--+
-||        |+---------------------------------------->|               |                    |SentimentAPI)|  |  |
-|+--------+|                              :          |               |                    +---+---------+  |  |
-|MobileApp |                              |          |               |                        |            |  |
-+----------+                              |          |               |                        +---+--------+  |
-                                          |          |               |                            |           |
-                                          |          |               |                            +-----------+
-                                          |     +--->|               | API Aggregator
-                                          |     |    |               | (2) routes /api_sp/
-                                          |     |    |               +--------------+
-                                          |     |    |               |              |                                                  
-                                          |     |    |               |              |  
-                                          |     |    +---------------+              |  
-                                          |     | The .lua script does the          |
-                                          |     | requests to the REST API.         |
-                                          |     | Converts a single (2) call        |
-                                                | to multiple (1) calls             v
-                                                |                            +-------------------------------+
-                                                |                            |Nginx+LUA API Aggregator       |
-                                                |                            | /---------------------------\ |
-                                                |                            | |Sandbox                    | |
-                                                +----------------------------+ | /-----------------------\ | | 
-                                                                             | | |positive_word.lua {d}  | | |
-                                                                             | | \-----------------------/ | |
-                                                                             | | ...                       | |
-                                                                             | | /-----------------------\ | |
-                                                                             | | |something_else.lua {d} | | |
-                                                                             | | \-----------------------/ | |
-                                                                             | | /-----------------------\ | |
-                                                                             | | |another.lua        {d} | | |
-                                                                             | | \-----------------------/ | |
-                                                                             | \---------------------------/ |
-                                                                             +-------------------------------+
+![Architecture Diagram](/data/architecture_diagram.png "Architecture Diagram")
 
-```
 
 ## HOWTO INSTALL
 
