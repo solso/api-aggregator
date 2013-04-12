@@ -1,7 +1,7 @@
 
 ## API AGGREGATOR
 
-API Aggregator is a system that combines lua and nginx to have a sandboxed environment where you can safely run user generated scripts that do API aggregation. 
+API Aggregator is a system that combines lua and nginx to have a sandbox environment where you can safely run user generated scripts that do API aggregation. 
 
 **Why API aggregation?**
 
