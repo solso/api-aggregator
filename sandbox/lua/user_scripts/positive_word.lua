@@ -1,4 +1,9 @@
 
+--[[
+User script that returns the word with highest positive emotional value.
+It runs against the SentimentAPI REST AP. See blog entry for the full details.
+]]--
+
 return function()
 
   local max_sentiment = 5

@@ -35,7 +35,7 @@ You can change the --prefix to set up your base directory.
 
 You can start the Nginx that acts as load balancer (and that hosts the html5 app demo) like this:
     
-    /opt/openresty/nginx/sbin/nginx -c conf/nginx_as_load_balancer.conf -p `pwd`/lb/
+    /opt/openresty/nginx/sbin/nginx -p `pwd`/lb/
 
 This assumes you are on that in the base directory of the api-aggregation project. You can always replace 
 the `pwd` with your full path to the _api-aggregator/lb_ directory.
@@ -58,9 +58,13 @@ Before running the sandbox you must change the variable $lua_user_scripts_path t
 on the _sandbox/conf/nginx.conf_
 
     set $lua_user_scripts_path "/path/to/api-aggregator/sandbox/lua/user_scripts/";
-    
-The _api-aggregator/sandbox/lua/user_scripts/_ part belongs to the structure of the github project, if you are running it on your own dir structure
-remember to change it accordingly.
+
+All the user lua scripts that do API aggregation (the stored procedures) should be in the directory defined above. 
+
+The name of the lua script is used to build the API endpoint, the URL. For instance, a script called _positive_word.lua_ 
+will automatically be available at the end-point /aggr/positive_word/*. If you want an end-point /aggr/foo/ID.xml you will
+ have to create a lua script called foo.lua. This convention is used to automatically map user scripts to API end-points, you
+ can force arbitrary mappings using the directive _location_ of nginx.
 
 Once you updated the _sandbox/conf/nginx.conf_ you can start it:
 
@@ -85,7 +89,7 @@ SentimentAPI is running on `localhost:8080`. You can test it with:
 
 ### 5) Ready to go
 
-Go to your browser to _localhost:8000/demo_. You will get the HTML5 App demo that showcases the performance improvements
+Go to your browser to _localhost:8000/demo/_. You will get the HTML5 App demo that showcases the performance improvements
 of API aggregation over direct REST access. Enjoy! 
 
 ## Troubleshotting

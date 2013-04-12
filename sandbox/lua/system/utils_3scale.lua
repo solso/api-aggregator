@@ -27,4 +27,23 @@ function M.unescape(self)
   return string.gsub(nstr, "%%(%x%x)", function (h) return string.char(tonumber(h, 16)) end)
 end
 
+function M.get_query_args_extended(self)
+  local args = self
+  for k, v in pairs(args) do
+    t = {}
+    for k2 in string.gmatch(k, "%b[]") do
+      table.insert(t,string.sub(k2,2,string.len(k2)-1))
+    end
+    if #t > 0 then
+      -- it has nested params, needs to be transformed
+      first = string.sub(k,1,string.find(k,"%[")-1)
+      if args[first]==nil or type(args[first])~="table" then
+        args[first] = {}
+      end
+      args[first][t[1]] = v
+    end
+  end
+  return args
+end
+
 return M

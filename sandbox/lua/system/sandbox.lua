@@ -56,8 +56,23 @@ sandboxed_env = {
   ngx = ngx
 }
 
-lc = assert(loadfile(ngx.var.lua_user_scripts_path..ngx.var.function_to_call_file))
-user_function = lc()
+--[[
+  Needs to file which file to lua based on the URL
+]]--
+
+local utils = require "utils_3scale"
+local path = utils.split(ngx.var.request," ")[2]
+local user_script_file = ngx.re.match(path,[=[^\/aggr\/([a-zA-Z0-9-_]+)]=])[1]
+lc = loadfile(ngx.var.lua_user_scripts_path..user_script_file..".lua")
+
+if (lc == nil) then
+  ngx.exit(ngx.HTTP_NOT_FOUND)
+else
+  user_function = lc()
+  if (user_function == nil) then
+    ngx.exit(ngx.HTTP_NOT_FOUND)
+  end
+end
 
 local timeout_response = function()
   debug.sethook()
