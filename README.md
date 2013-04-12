@@ -1,5 +1,4 @@
 
-
 ## API AGGREGATOR
 
 API Aggregator is a system that combines lua and nginx to have a sandboxed environment where you can safely run user generated scripts that do API aggregation. 
@@ -95,7 +94,7 @@ The end-point is derived from the name of the lua file. The naming convention is
 ## ARCHITECTURE
 
 
-
+```
   +-+                                     |
   | |                                     :
 +-+ +------+                              |                                                                                                                            
@@ -139,7 +138,7 @@ The end-point is derived from the name of the lua file. The naming convention is
                                                                              | \---------------------------/ |
                                                                              +-------------------------------+
 
-
+```
 
 ## HOWTO INSTALL
 
