@@ -1,29 +1,81 @@
 
 
-## API Aggregator
+## API AGGREGATOR
 
 API Aggregator is a system that combines lua and nginx to have a sandboxed environment where you can safely run user generated scripts that do API aggregation. 
 
-Why API aggregation? 
+**Why API aggregation?**
 
 REST API's are chatty because of its fine granularity. The high number of requests needed to accomplish non-trivial use cases can affect the performance of applications using such API's. This problem is particularly acute for mobile apps. See the [blog post]() for some empirical results, for that particular case, requests time was reduced by a factor or 3.
 
-How? 
+**How?**
 
-Instead of accessing the public methods of the API, a developer can create a lua script that has the full workflow for their use-case. This lua script can be run safely on the servers of the API provider (if they use API Aggregator, that is). The underlying idea is pretty much like **stored procedures for APIs**. 
+Instead of accessing the public methods of the API, a developer can create a lua script that has the full workflow for their use-case. This lua script can be run safely on the servers of the API provider (if they use API Aggregator, that is). 
+
+The underlying idea is pretty much like **stored procedures for APIs**. 
+
+Note that this approach is not unheard of. Netflix, for instance, has a [JVM-based sandbox environment](http://techblog.netflix.com/2013/01/optimizing-netflix-api.html) so that their different development teams can create custom end-points for their specific needs on top of REST based API. With API Aggregator you can get quite close to the same design :-)
 
 
-## Adding User Scripts
+## ADDING API AGGREGATION SCRIPTS
 
 To add a user generated script ("the stored procedure") you only need to drop the lua file to the directory defined in $lua_user_scripts_path,
 
 The scripts must be unnamed functions, 
 
-<script src="https://gist.github.com/solso/5372568.js"></script>
-  
+```lua
+return function()
+  -- magic goes here
+ngx.exit(ngx.HTTP_OK)
+end
+```
+
 A example of a proper user script,
 
-<script src="https://gist.github.com/solso/5372559.js"></script>
+```
+return function()
+
+  local max_sentiment = 5
+  local params = ngx.req.get_query_args()
+  local path = utils.split(ngx.var.request," ")[2]
+
+  -- Get the sentence to be analyzed from the URL path
+  local sentence = ngx.re.match(path,[=[^/aggr/positive_word/(.+).json]=])[1]
+  sentence = utils.unescape(sentence)
+
+  -- Do the REST API request to get the sentiment value of the sentence
+  local res_sentence = ngx.location.capture("/v1/sentence/".. utils.escape(sentence) .. ".json" )
+  local result = cjson.decode(res_sentence.body)
+
+  -- If positive
+  if (result["sentiment"]>0) then
+
+    sentence = utils.unescape(sentence)
+
+    local max = nil
+    local words = utils.split(sentence," ")
+
+    -- for each word in the sentence, do the REST API request to get the sentiment value of the 
+    -- word
+    for i,w in pairs(words) do
+      local res_word = ngx.location.capture("/v1/word/".. utils.escape(w) .. ".json" )
+      local word = cjson.decode(res_word.body)
+      if max == nil or max < word.sentiment then
+        max = word.sentiment
+        result.highest_positive_sentiment_word = word
+        if word.sentiment == max_sentiment then
+          break
+        end
+      end
+    end
+  end
+
+  ngx.header.content_type = "application/json"
+  ngx.say(cjson.encode(result))
+  ngx.exit(ngx.HTTP_OK)
+
+end
+```
 
 
 The script above aggregates 1+N requests to a REST API to serve a very particular use-case: to get the word with a highest positive emotional value of a sentence if it's a positive sentence. This use case is very specific to a particular application, so it should not be "public". 
@@ -40,12 +92,11 @@ The developer of the application now, can have access to a new API endpoint call
 
 The end-point is derived from the name of the lua file. The naming convention is defined.
 
-## Architecture Diagram
+## ARCHITECTURE
 
 
 
-
-## Intallation
+## HOWTO INSTALL
 
 ### 1) Install Nginx with Lua Support 
 
@@ -135,20 +186,21 @@ SentimentAPI is running on `localhost:8080`. You can test it with:
 Go to your browser to _localhost:8000/demo/_. You will get the HTML5 App demo that showcases the performance improvements
 of API aggregation over direct REST access. Enjoy! 
 
-## Troubleshotting
+## TOUBLE-SHOOTING
 
 It's quit advisable to keep an eye on the error.log when trying it out, 
 
     tail -f */logs/error.log
 
-## Contributors
+## CONTRIBUTORS
 
 * Josep M. Pujol (solso)
 * Raimon Grau (kidd)    
 
-## License
+## LICENSE
 
 MIT License
+
 Copyright (c) 2013 3scale
 
 
