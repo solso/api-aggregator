@@ -1,4 +1,3 @@
-
 --[[
 
 Run the API aggregation scripts on a sandboxed environment
@@ -18,7 +17,7 @@ Additionally, you can set up a timeout of the script by setting a value on,
 
 debug.sethook(timeout_response, "", 5000)
 
-The 2000 is the number of operations that the lua script can execute before timing
+The 5000 is the number of operations that the lua script can execute before timing
 out. This will kill automatically any long running requests. Tuning this parameters
 depends on the complexity of the scripts that you allow to run. 5000 is plenty for 
 the sentence_with_highest_word.lua 
