@@ -18,7 +18,9 @@ Note that this approach is not unheard of. Netflix, for instance, has a [JVM-bas
 
 ## ADDING API AGGREGATION SCRIPTS
 
-To add a user generated script ("the stored procedure") you only need to drop the lua file to the directory defined in $lua_user_scripts_path,
+To add a user generated script ("the stored procedure") you only need to drop the lua file to the directory defined in $lua_user_scripts_path.
+
+After adding the script, the end-point will be dynamically generated in runtime and it will be immediately available.
 
 The scripts must be unnamed functions, 
 
@@ -29,7 +31,7 @@ return function()
 end
 ```
 
-A example of a proper user script,
+A example of a real user script,
 
 ```lua
 return function()
@@ -77,24 +79,23 @@ end
 ```
 
 
-The script above aggregates 1+N requests to a REST API to serve a very particular use-case: to get the word with a highest positive emotional value of a sentence if it's a positive sentence. This use case is very specific to a particular application, so it should not be "public". 
+This lua script aggregates 1+N requests to a REST API to serve a very particular use-case: to get the word with a highest positive emotional value of a sentence if it's positive. This use case is very specific to a particular application, so it should not be "public". 
 
 However, being able to colocate the aggregator script with the API have multiple benefits for all parties involved:
 
   * For API consumers: it reduces the number of requests, thus reducing the page load time and if it's a mobile app, power consumption. Furthermore, it eliminates the need to run a backend services for your API to do exactly the type of aggregation that can be done now
   by the provider using API Aggregator.
   * For API providers, the bandwidth and the number of open connections is reduced. And what's more important, you are making your API very friendly
-  to developers to use since they can create custom scripts to do complex operations.
+  to developers to use since they can create custom scripts that meet their particular use-cases.
   
 
-The developer of the application now, can have access to a new API endpoint called  _/aggr/positive_word/*.json__ that does all the heavy-lifting against the REST API of the provider. The result is a simpler and faster application.
+After adding the lua script the developer can immediately access a new API endpoint named  _/aggr/positive_word/*.json__. This new API method does all the heavy-lifting against the REST API of the provider. 
 
-The end-point is derived from the name of the lua file. The naming convention is defined.
+The end-point is derived from the name of the lua file, or it can be customized on the configuration file.
 
 ## ARCHITECTURE
 
-A small diagram to better understand the flow. The diagram depicts the flow of the example that 
-you can setup locally if you follow the HowTo Install section.
+The diagram depicts the flow of the example that you can setup locally if you follow the HowTo Install section.
 
 ![Architecture Diagram](/data/architecture_diagram.png "Architecture Diagram")
 
@@ -169,7 +170,7 @@ Once you updated the _sandbox/conf/nginx.conf_ you can start it:
 
 Again, you can stop it with `-s stop`
 
-The sandbox is running on _localhost:8090_ (unless you change the listen port on the config file _api-aggregator/sandbox/conf/nginx_as_sandbox.conf_)
+The sandbox is running on _localhost:8090_ (unless you change the listen port on the config file _api-aggregator/sandbox/conf/nginx.conf_)
 
 ### 3) Setup the SentimentAPI 
 
