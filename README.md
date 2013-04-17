@@ -5,7 +5,7 @@ API Aggregator is a system that combines lua and nginx to have a sandbox environ
 
 **Why API aggregation?**
 
-REST API's are chatty because of its fine granularity. The high number of requests needed to accomplish non-trivial use cases can affect the performance of applications using such API's. This problem is particularly acute for mobile apps. See the [blog post]() for some empirical results, for that particular case, requests time was reduced by a factor or 3.
+REST API's are chatty because of its fine granularity. The high number of requests needed to accomplish non-trivial use cases can affect the performance of applications using such API's. This problem is particularly acute for mobile apps. See the [blog post](http://3scale.github.io/2013/04/18/accelerate-your-mobile-api-with-nginx-and-lua/) for some empirical results, for that particular case, requests time was reduced by a factor or 3.
 
 **How?**
 
@@ -13,7 +13,7 @@ Instead of accessing the public methods of the API, a developer can create a lua
 
 The underlying idea is pretty much like **stored procedures for APIs**. 
 
-Note that this approach is not unheard of. Netflix, for instance, has a [JVM-based sandbox environment](http://techblog.netflix.com/2013/01/optimizing-netflix-api.html) so that their different development teams can create custom end-points for their specific needs on top of REST based API. With API Aggregator you can get quite close to the same design :-)
+Note that this approach is not unheard of. [Netflix](http://netflix.com), for instance, has a [JVM-based sandbox environment](http://techblog.netflix.com/2013/01/optimizing-netflix-api.html) so that their different development teams can create custom end-points for their specific needs on top of REST based API. With API Aggregator you can get quite close to the same design :-)
 
 
 ## ADDING API AGGREGATION SCRIPTS
@@ -190,7 +190,7 @@ SentimentAPI is running on `localhost:8080`. You can test it with:
 Go to your browser to _localhost:8000/demo/_. You will get the HTML5 App demo that showcases the performance improvements
 of API aggregation over direct REST access. Enjoy! 
 
-## TOUBLE-SHOOTING
+## TROUBLESHOOTING
 
 It's quit advisable to keep an eye on the error.log when trying it out, 
 
